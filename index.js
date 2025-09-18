@@ -44,10 +44,12 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ message: "User not found" });
     }
 
-    // ⚠️ Plain password check for now (replace with bcrypt later)
-    if (user.password !== password) {
-      return res.status(401).json({ message: "Invalid password" });
-    }
+     // Compare hashed password
+     const isMatch = await bcrypt.compare(password, user.password);
+     if (!isMatch) {
+       return res.status(401).json({ message: "Invalid password" });
+     }
+ 
 
     res.json({ message: "Login successful" });
   } catch (err) {
@@ -58,7 +60,7 @@ app.post('/login', async (req, res) => {
 
 
 
-// Register API
+
 app.post('/register', async (req, res) => {
   const { username, email, password, confirmPassword } = req.body;
 
@@ -73,8 +75,11 @@ app.post('/register', async (req, res) => {
       return res.status(400).json({ message: "Username or email already exists" });
     }
 
-    // create new user
-    const newUser = new User({ username, email, password });
+    // hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // create new user with hashed password
+    const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
 
     res.json({ message: "User registered successfully" });
@@ -83,6 +88,7 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 const crypto = require('crypto');
 
