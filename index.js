@@ -17,10 +17,10 @@ mongoose.connect("mongodb://127.0.0.1:27017/auth_demo")
 
 // Import routes
 const authRoutes = require('./auth_api'); // Make sure path is correct
-
+const bookRoutes = require('./book_api.js'); // Make sure path is correct
 // Use routes
 app.use('/auth', authRoutes);
-
+app.use('/book', bookRoutes);
 // Test route
 app.get('/', (req, res) => {
   res.send("Server is running");
